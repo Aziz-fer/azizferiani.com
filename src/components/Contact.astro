@@ -1,0 +1,125 @@
+---
+import Icon from './Icon.astro';
+import { profile } from '../data/profile';
+import { t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+
+const socials = [
+  { href: profile.links.linkedin, icon: 'linkedin', label: 'LinkedIn', handle: 'Aziz Feriani' },
+  { href: profile.links.github, icon: 'github', label: 'GitHub', handle: 'Aziz-fer' },
+  { href: profile.links.instagram, icon: 'instagram', label: 'Instagram', handle: '@aziz.feriani' },
+] as const;
+---
+
+<section id="contact" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-4xl px-4 sm:px-6">
+    <div class="contact-card glass rounded-[2rem] px-6 py-14 text-center sm:px-12" data-reveal="scale" data-spotlight>
+      <p class="kicker justify-center">{ui.contact.kicker}</p>
+      <h2 class="font-display mt-4 text-[clamp(2.3rem,5.5vw,4rem)] leading-[1.05] font-semibold">{ui.contact.title}</h2>
+      <p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted">{ui.contact.text}</p>
+
+      <div class="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a href={`mailto:${profile.email}`} class="btn btn-primary text-base" dir="ltr">
+          <Icon name="mail" size={18} />
+          {profile.email}
+        </a>
+        <button type="button" class="btn btn-ghost" data-copy={profile.email} data-copied={ui.contact.copied}>
+          <Icon name="copy" size={18} />
+          <span data-copy-label>{ui.contact.copy}</span>
+        </button>
+      </div>
+
+      <ul class="mt-10 flex flex-wrap justify-center gap-3">
+        {
+          socials.map((s) => (
+            <li>
+              <a href={s.href} target="_blank" rel="noopener" class="contact-social">
+                <Icon name={s.icon} size={18} />
+                <span dir="ltr">{s.handle}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p class="mt-8 inline-flex items-center gap-2 text-sm text-muted">
+        <Icon name="pin" size={16} />
+        {ui.contact.location}
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(500px circle at var(--mx, 50%) var(--my, 0%), var(--glow), transparent 60%);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  .contact-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from var(--angle, 0deg), transparent 0 60%, var(--gold) 75%, var(--sunset) 85%, transparent 95%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    animation: border-spin 8s linear infinite;
+    pointer-events: none;
+  }
+
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  @keyframes border-spin {
+    to {
+      --angle: 360deg;
+    }
+  }
+
+  .contact-social {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease,
+      transform 0.3s var(--ease-out-expo);
+  }
+
+  .contact-social:hover {
+    color: var(--accent-text);
+    border-color: var(--gold);
+    transform: translateY(-3px);
+  }
+</style>

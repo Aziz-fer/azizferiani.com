@@ -1,0 +1,409 @@
+@import 'tailwindcss';
+
+/* ---------- Theme tokens ---------- */
+:root,
+:root[data-theme='night'] {
+  color-scheme: dark;
+  --bg: #0f1530;
+  --bg-2: #1d2550;
+  --sky-top: #070b1f;
+  --sky-mid: #121a42;
+  --sky-low: #2a2858;
+  --surface: rgb(24 31 72 / 0.55);
+  --surface-strong: rgb(29 37 80 / 0.85);
+  --border: rgb(243 217 164 / 0.14);
+  --border-strong: rgb(243 217 164 / 0.32);
+  --text: #f5ead6;
+  --muted: rgb(245 234 214 / 0.7);
+  --gold: #f3d9a4;
+  --gold-strong: #e8c27a;
+  --accent-text: #f3d9a4;
+  --sunset: #e9a87a;
+  --rose: #a8738c;
+  --amphora: #b5562d;
+  --silhouette: #3a3361;
+  --sea-1: #232b5e;
+  --sea-2: #1b2250;
+  --sea-3: #121840;
+  --glow: rgb(243 217 164 / 0.35);
+  --shadow: 0 20px 60px -20px rgb(0 0 0 / 0.6);
+}
+
+:root[data-theme='dawn'] {
+  color-scheme: light;
+  --bg: #fbf3e6;
+  --bg-2: #f3e4cc;
+  --sky-top: #fdf8ef;
+  --sky-mid: #f8ecd9;
+  --sky-low: #f2d9bd;
+  --surface: rgb(255 255 255 / 0.62);
+  --surface-strong: rgb(255 252 246 / 0.92);
+  --border: rgb(29 37 80 / 0.12);
+  --border-strong: rgb(154 107 37 / 0.4);
+  --text: #1d2550;
+  --muted: rgb(29 37 80 / 0.72);
+  --gold: #b8863b;
+  --gold-strong: #9a6b25;
+  --accent-text: #8a5a1a;
+  --sunset: #d98a5c;
+  --rose: #a8738c;
+  --amphora: #b5562d;
+  --silhouette: #b99a8f;
+  --sea-1: #cfd6ea;
+  --sea-2: #b9c3e0;
+  --sea-3: #a3afd3;
+  --glow: rgb(184 134 59 / 0.3);
+  --shadow: 0 20px 50px -24px rgb(29 37 80 / 0.35);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text);
+  --color-muted: var(--muted);
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-accent: var(--accent-text);
+  --color-sunset: var(--sunset);
+  --color-rose: var(--rose);
+  --color-amphora: var(--amphora);
+}
+
+@theme {
+  --font-sans: 'Inter Variable', 'Amiri', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Cormorant Garamond Variable', 'Aref Ruqaa', Georgia, serif;
+  --font-arabic: 'Amiri', 'Inter Variable', serif;
+  --font-ruqaa: 'Aref Ruqaa', 'Amiri', serif;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- Base ---------- */
+html {
+  background: var(--bg);
+  color: var(--text);
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.6s ease,
+    color 0.6s ease;
+}
+
+:root[lang='ar'] body {
+  font-family: var(--font-arabic);
+  font-size: 1.08rem;
+  line-height: 1.85;
+}
+
+/* Cormorant's default old-style figures make "10" read like "IO". */
+.font-display {
+  font-variant-numeric: lining-nums;
+}
+
+:root[lang='ar'] .font-display {
+  font-family: var(--font-ruqaa);
+  letter-spacing: 0;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* Themed scrollbar */
+html {
+  scrollbar-color: var(--gold) var(--bg);
+  scrollbar-width: thin;
+}
+
+/* ---------- Sky background (all pages) ---------- */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(1200px 600px at 85% 110%, color-mix(in srgb, var(--rose) 22%, transparent), transparent 70%),
+    radial-gradient(900px 500px at 10% 120%, color-mix(in srgb, var(--sunset) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-low) 100%);
+  transition: opacity 0.6s ease;
+}
+
+.sky canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Soft glow that follows the cursor (desktop only) */
+.cursor-glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(500px circle at var(--cx, 50%) var(--cy, -20%), var(--glow), transparent 60%);
+  opacity: 0.35;
+}
+
+@media (pointer: coarse) {
+  .cursor-glow {
+    display: none;
+  }
+}
+
+/* ---------- Reusable pieces (in the components layer so Tailwind utilities can override them) ---------- */
+@layer components {
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: var(--shadow);
+}
+
+.text-gold-gradient {
+  background: linear-gradient(100deg, var(--gold-strong) 0%, var(--gold) 30%, #fff6e2 50%, var(--gold) 70%, var(--sunset) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 8s ease-in-out infinite;
+}
+
+:root[data-theme='dawn'] .text-gold-gradient {
+  background-image: linear-gradient(100deg, #7a4d12 0%, var(--gold-strong) 30%, #d9a75a 50%, var(--gold-strong) 70%, var(--amphora) 100%);
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 0% 50%;
+  }
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+:root[lang='ar'] .kicker {
+  letter-spacing: 0;
+  font-size: 1rem;
+}
+
+.kicker::before {
+  content: '';
+  width: 2.25rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold));
+}
+
+:root[dir='rtl'] .kicker::before {
+  background: linear-gradient(-90deg, transparent, var(--gold));
+}
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    transform 0.3s var(--ease-out-expo),
+    box-shadow 0.3s ease,
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  color: #1a1530;
+  background: linear-gradient(120deg, var(--gold) 0%, var(--sunset) 100%);
+  box-shadow: 0 10px 30px -10px var(--glow);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 16px 40px -10px var(--glow);
+}
+
+:root[data-theme='dawn'] .btn-primary {
+  color: #fffaf0;
+  background: linear-gradient(120deg, var(--gold-strong) 0%, var(--amphora) 100%);
+}
+
+.btn-ghost {
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.btn-ghost:hover {
+  border-color: var(--gold);
+  color: var(--accent-text);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  direction: ltr;
+}
+
+.prose-ar p {
+  margin-block: 0 1.1em;
+  text-indent: 1.3em;
+}
+
+.prose-ar p:first-child {
+  text-indent: 0;
+}
+
+.prose-ar h2 {
+  font-family: var(--font-ruqaa);
+  font-size: 1.6rem;
+  color: var(--accent-text);
+  text-align: center;
+  margin-block: 2.5rem 1.25rem;
+}
+
+.prose-ar h2::before {
+  content: '◆  ◆  ◆';
+  display: block;
+  font-size: 0.6rem;
+  letter-spacing: 0.4em;
+  color: var(--gold);
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+}
+}
+
+/* ---------- Scroll reveal ---------- */
+:root.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s var(--ease-out-expo),
+    transform 0.9s var(--ease-out-expo);
+  transition-delay: var(--d, 0ms);
+}
+
+:root.js [data-reveal='left'] {
+  transform: translateX(-36px);
+}
+
+:root.js [data-reveal='scale'] {
+  transform: scale(0.94);
+}
+
+:root.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  :root.js [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Print (used by /cv) ---------- */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm 14mm 16mm;
+  }
+  :root,
+  :root[data-theme] {
+    color-scheme: light;
+    --bg: #fff;
+    --text: #1d2550;
+    --muted: #4a5070;
+    --accent-text: #8a5a1a;
+    --gold: #9a6b25;
+    --border: #d9d3c7;
+    --surface: #fff;
+  }
+  html,
+  body {
+    background: #fff !important;
+    color: #1d2550 !important;
+    font-size: 10pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  .no-print,
+  .sky,
+  .cursor-glow,
+  .skip-link {
+    display: none !important;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}

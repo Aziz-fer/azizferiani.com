@@ -1,0 +1,196 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  cover: ImageMetadata;
+  alt: string;
+  /** Rendered width in CSS pixels (the cover keeps its aspect ratio). */
+  width?: number;
+  /** Arabic books open to the left, so their page edges show on the left. */
+  rtl?: boolean;
+  eager?: boolean;
+  class?: string;
+}
+
+const { cover, alt, width = 300, rtl = true, eager = false, class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={['book3d', { 'is-rtl': rtl }, className]}
+  data-tilt="12"
+  style={`--w: ${width}px; --ratio: ${cover.width} / ${cover.height};`}
+>
+  <div class="book3d-float">
+    <div class="book3d-inner">
+      <span class="book3d-back" aria-hidden="true"></span>
+      <span class="book3d-pages" aria-hidden="true"></span>
+      <span class="book3d-front">
+        <Image
+          src={cover}
+          alt={alt}
+          width={Math.min(cover.width, width * 2)}
+          class="book3d-img"
+          loading={eager ? 'eager' : 'lazy'}
+        />
+        <span class="book3d-spine" aria-hidden="true"></span>
+        <span class="book3d-glare" aria-hidden="true"></span>
+      </span>
+    </div>
+  </div>
+  <span class="book3d-shadow" aria-hidden="true"></span>
+</div>
+
+<style>
+  .book3d {
+    --depth: calc(var(--w) * 0.09);
+    position: relative;
+    width: min(var(--w), 72vw);
+    aspect-ratio: var(--ratio);
+    perspective: 1600px;
+  }
+
+  .book3d-float {
+    width: 100%;
+    height: 100%;
+    animation: book-float 7s ease-in-out infinite;
+  }
+
+  .book3d-inner {
+    --turn: -24deg;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transform: rotateY(calc(var(--turn) + var(--ry, 0deg))) rotateX(calc(4deg + var(--rx, 0deg)));
+    transition: transform 0.8s var(--ease-out-expo);
+  }
+
+  .is-rtl .book3d-inner {
+    --turn: 24deg;
+  }
+
+  .book3d:global(.is-tilting) .book3d-inner {
+    transition: transform 0.12s linear;
+  }
+
+  .book3d-front,
+  .book3d-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 3px 8px 8px 3px;
+    overflow: hidden;
+  }
+
+  .is-rtl .book3d-front,
+  .is-rtl .book3d-back {
+    border-radius: 8px 3px 3px 8px;
+  }
+
+  .book3d-front {
+    transform: translateZ(calc(var(--depth) / 2));
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 0.15);
+  }
+
+  .book3d-back {
+    transform: translateZ(calc(var(--depth) / -2));
+    background: #2a2550;
+    box-shadow: 30px 40px 60px -20px rgb(0 0 0 / 0.5);
+  }
+
+  .book3d-front :global(.book3d-img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .book3d-pages {
+    position: absolute;
+    top: 1.2%;
+    bottom: 1.2%;
+    width: var(--depth);
+    inset-inline: auto;
+    right: calc(var(--depth) / -2);
+    transform: rotateY(90deg);
+    background: repeating-linear-gradient(90deg, #f7eedb 0 1px, #dccfb2 1px 2px);
+    box-shadow: inset 0 0 8px rgb(0 0 0 / 0.25);
+  }
+
+  .is-rtl .book3d-pages {
+    right: auto;
+    left: calc(var(--depth) / -2);
+  }
+
+  .book3d-spine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgb(0 0 0 / 0.35) 0%,
+      rgb(255 255 255 / 0.12) 2.2%,
+      rgb(0 0 0 / 0.12) 4%,
+      transparent 7%
+    );
+    pointer-events: none;
+  }
+
+  .is-rtl .book3d-spine {
+    background: linear-gradient(
+      -90deg,
+      rgb(0 0 0 / 0.35) 0%,
+      rgb(255 255 255 / 0.12) 2.2%,
+      rgb(0 0 0 / 0.12) 4%,
+      transparent 7%
+    );
+  }
+
+  .book3d-glare {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--gx, 30%) var(--gy, 20%), rgb(255 255 255 / 0.35), transparent 55%);
+    mix-blend-mode: soft-light;
+    opacity: 0.5;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .book3d:global(.is-tilting) .book3d-glare {
+    opacity: 1;
+  }
+
+  .book3d-shadow {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -7%;
+    height: 9%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(0 0 0 / 0.45), transparent);
+    filter: blur(6px);
+    animation: book-shadow 7s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  @keyframes book-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-14px);
+    }
+  }
+
+  @keyframes book-shadow {
+    0%,
+    100% {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scaleX(0.86);
+      opacity: 0.7;
+    }
+  }
+</style>

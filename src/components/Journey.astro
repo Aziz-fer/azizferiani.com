@@ -1,0 +1,187 @@
+---
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import { journey } from '../data/profile';
+import { formatMonth, t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+
+const period = (start: string, end: string | undefined, yearsOnly?: boolean) => {
+  const fmt = (ym: string) => (yearsOnly ? ym.slice(0, 4) : formatMonth(ym, locale));
+  return `${fmt(start)} – ${end ? fmt(end) : ui.journey.present}`;
+};
+---
+
+<section id="journey" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <SectionHeading kicker={ui.journey.kicker} title={ui.journey.title} />
+
+    <ol class="timeline relative" data-timeline>
+      <span class="timeline-track" aria-hidden="true"><span class="timeline-fill"></span></span>
+      {
+        journey.map((item, i) => (
+          <li class="timeline-item relative ps-12 sm:ps-16" data-timeline-item>
+            <span class:list={['timeline-dot', { 'is-current': !item.end }]} aria-hidden="true">
+              <Icon name={item.type === 'work' ? 'briefcase' : 'cap'} size={14} />
+            </span>
+            <article class="card glass rounded-3xl p-6 sm:p-8" data-reveal style={`--d: ${i * 60}ms`} data-spotlight>
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+                <span class="rounded-full border border-line-strong px-3 py-1 text-xs font-semibold text-accent">
+                  {item.type === 'work' ? ui.journey.work : ui.journey.education}
+                </span>
+                <span class="text-muted tabular-nums">{period(item.start, item.end, item.yearsOnly)}</span>
+                <span class="flex items-center gap-1 text-muted">
+                  <Icon name="pin" size={14} />
+                  {item.location[locale]}
+                </span>
+              </div>
+              <h3 class="font-display mt-4 text-2xl font-semibold sm:text-3xl">{item.role[locale]}</h3>
+              <p class="mt-1 text-lg text-accent">
+                {item.orgUrl ? (
+                  <a href={item.orgUrl} target="_blank" rel="noopener" class="hover:underline">
+                    {item.org}
+                  </a>
+                ) : (
+                  item.org
+                )}
+              </p>
+              <ul class="mt-5 space-y-2.5 text-muted">
+                {item.points[locale].map((p) => (
+                  <li class="flex gap-3">
+                    <span class="mt-[0.7em] h-1.5 w-1.5 shrink-0 rounded-full bg-gold" aria-hidden="true" />
+                    <span>{p}</span>
+                  </li>
+                ))}
+              </ul>
+              {item.tags && (
+                <ul class="mt-5 flex flex-wrap gap-2">
+                  {item.tags.map((tag) => (
+                    <li class="tag">{tag}</li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .timeline {
+    display: grid;
+    gap: 2rem;
+    --progress: 0;
+  }
+
+  .timeline-track {
+    position: absolute;
+    inset-inline-start: 1.05rem;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    width: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  @media (min-width: 640px) {
+    .timeline-track {
+      inset-inline-start: 1.55rem;
+    }
+  }
+
+  .timeline-fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, var(--gold), var(--sunset), var(--rose));
+    transform: scaleY(var(--progress));
+    transform-origin: top;
+    box-shadow: 0 0 12px var(--glow);
+  }
+
+  .timeline-dot {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 1.75rem;
+    display: grid;
+    place-items: center;
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--bg);
+    border: 2px solid var(--border-strong);
+    transition:
+      color 0.5s ease,
+      border-color 0.5s ease,
+      box-shadow 0.5s ease,
+      transform 0.5s var(--ease-out-expo);
+  }
+
+  @media (min-width: 640px) {
+    .timeline-dot {
+      inset-inline-start: 0.5rem;
+    }
+  }
+
+  .timeline-item:global(.is-active) .timeline-dot {
+    color: #1a1530;
+    background: var(--gold);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold) 18%, transparent), 0 0 24px var(--glow);
+    transform: scale(1.08);
+  }
+
+  .timeline-dot.is-current::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 999px;
+    border: 2px solid var(--gold);
+    animation: ring 2.4s ease-out infinite;
+  }
+
+  @keyframes ring {
+    from {
+      transform: scale(0.8);
+      opacity: 0.9;
+    }
+    to {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
+
+  .card {
+    position: relative;
+    overflow: hidden;
+    transition:
+      border-color 0.4s ease,
+      transform 0.4s var(--ease-out-expo);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), var(--glow), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .card:hover {
+    border-color: var(--border-strong);
+  }
+
+  .card:hover::before {
+    opacity: 0.35;
+  }
+</style>

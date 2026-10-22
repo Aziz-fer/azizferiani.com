@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+import { t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  class?: string;
+}
+
+const { locale, class: className = '' } = Astro.props;
+---
+
+<p class:list={['translation-note', className]}>
+  <Icon name="globe" size={16} class="shrink-0" />
+  <span>{t(locale).bookPage.translationNote}</span>
+</p>
+
+<style>
+  .translation-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: var(--accent-text);
+    border: 1px dashed var(--border-strong);
+    background: color-mix(in srgb, var(--gold) 8%, transparent);
+    text-align: start;
+  }
+</style>

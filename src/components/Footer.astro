@@ -1,0 +1,127 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { locales, localeNames, localePath, t, type Locale } from '../i18n/ui';
+import { profile } from '../data/profile';
+
+interface Props {
+  locale: Locale;
+  path?: string;
+}
+
+const { locale, path } = Astro.props;
+const ui = t(locale);
+const year = new Date().getFullYear();
+
+const socials = [
+  { href: profile.links.github, icon: 'github', label: 'GitHub' },
+  { href: profile.links.linkedin, icon: 'linkedin', label: 'LinkedIn' },
+  { href: profile.links.instagram, icon: 'instagram', label: 'Instagram' },
+  { href: `mailto:${profile.email}`, icon: 'mail', label: 'Email' },
+] as const;
+---
+
+<footer class="no-print relative mt-24 border-t border-line">
+  <div class="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-center md:justify-between">
+    <div class="flex items-center gap-3">
+      <Logo size={40} />
+      <div>
+        <p class="font-display text-xl font-semibold">{profile.name[locale]}</p>
+        <p class="text-sm text-muted">{ui.footer.made}</p>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      {
+        socials.map((s) => (
+          <a
+            href={s.href}
+            class="social"
+            aria-label={s.label}
+            target={s.icon === 'mail' ? undefined : '_blank'}
+            rel={s.icon === 'mail' ? undefined : 'noopener'}
+          >
+            <Icon name={s.icon} size={18} />
+          </a>
+        ))
+      }
+    </div>
+  </div>
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 pb-10 text-sm text-muted sm:px-6">
+    <p>© {year} {profile.name[locale]}</p>
+    <ul class="flex items-center gap-4">
+      <li><a class="hover:text-accent" href={localePath(locale, 'books/')}>{ui.nav.books}</a></li>
+      <li><a class="hover:text-accent" href={localePath(locale, 'cv/')}>{ui.nav.cv}</a></li>
+      {
+        locales
+          .filter((l) => l !== locale)
+          .map((l) => (
+            <li>
+              <a class="hover:text-accent" href={localePath(l, path ?? '')} hreflang={l} lang={l} data-astro-reload>
+                {localeNames[l].native}
+              </a>
+            </li>
+          ))
+      }
+    </ul>
+  </div>
+</footer>
+
+<button type="button" class="to-top no-print" data-to-top aria-label={ui.nav.backToTop}>
+  <Icon name="arrow-up" size={18} />
+</button>
+
+<style>
+  .social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease,
+      transform 0.3s var(--ease-out-expo),
+      box-shadow 0.3s ease;
+  }
+
+  .social:hover {
+    color: var(--accent-text);
+    border-color: var(--gold);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px -10px var(--glow);
+  }
+
+  .to-top {
+    position: fixed;
+    inset-inline-end: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 40;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 999px;
+    color: var(--accent-text);
+    background: var(--surface-strong);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+    cursor: pointer;
+    transition:
+      opacity 0.4s ease,
+      transform 0.4s var(--ease-out-expo);
+  }
+
+  .to-top.is-shown {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+</style>

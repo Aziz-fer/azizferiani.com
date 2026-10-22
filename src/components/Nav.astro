@@ -1,0 +1,251 @@
+---
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import { locales, localeNames, localePath, t, type Locale } from '../i18n/ui';
+import { profile } from '../data/profile';
+
+interface Props {
+  locale: Locale;
+  /** Current path without the locale prefix, e.g. "books/". */
+  path?: string;
+}
+
+const { locale, path } = Astro.props;
+const ui = t(locale);
+const home = localePath(locale, '');
+const isHome = path === '';
+const anchor = (id: string) => (isHome ? `#${id}` : `${home}#${id}`);
+
+const links = [
+  { href: anchor('about'), label: ui.nav.about },
+  { href: anchor('journey'), label: ui.nav.journey },
+  { href: anchor('projects'), label: ui.nav.projects },
+  { href: localePath(locale, 'books/'), label: ui.nav.books, current: path?.startsWith('books') },
+  { href: anchor('contact'), label: ui.nav.contact },
+];
+---
+
+<header class="no-print fixed inset-x-0 top-0 z-50">
+  <div class="mx-auto max-w-6xl px-3 pt-3 sm:px-4">
+    <nav
+      class="nav-shell flex items-center justify-between gap-2 rounded-full px-3 py-2 sm:px-5"
+      aria-label={ui.nav.menu}
+    >
+      <a href={home} class="group flex items-center gap-2.5" aria-label={profile.name[locale]}>
+        <Logo size={34} class="transition-transform duration-700 group-hover:rotate-[360deg]" />
+        <span class="font-display text-lg font-semibold tracking-wide sm:text-xl">{profile.name[locale]}</span>
+      </a>
+
+      <ul class="hidden items-center gap-1 lg:flex">
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} class="nav-link" aria-current={l.current ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="flex items-center gap-1.5">
+        <details class="lang relative" data-lang>
+          <summary class="icon-btn gap-1.5 !w-auto px-3" aria-label={ui.nav.language}>
+            <Icon name="globe" size={18} />
+            <span class="text-xs font-semibold">{localeNames[locale].short}</span>
+          </summary>
+          <ul class="glass absolute end-0 mt-2 min-w-40 rounded-2xl p-1.5">
+            {
+              locales.map((l) => (
+                <li>
+                  <a
+                    href={localePath(l, path ?? '')}
+                    hreflang={l}
+                    lang={l}
+                    class="lang-item"
+                    aria-current={l === locale ? 'true' : undefined}
+                    data-astro-reload
+                  >
+                    <span class="w-6 text-xs font-bold opacity-70">{localeNames[l].short}</span>
+                    {localeNames[l].native}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </details>
+
+        <button
+          type="button"
+          class="icon-btn"
+          data-theme-toggle
+          data-label-night={ui.nav.themeToNight}
+          data-label-dawn={ui.nav.themeToDawn}
+          aria-label={ui.nav.themeToDawn}
+        >
+          <Icon name="sun" size={18} class="theme-icon-sun" />
+          <Icon name="moon" size={18} class="theme-icon-moon" />
+        </button>
+
+        <button
+          type="button"
+          class="icon-btn menu-btn"
+          data-menu-toggle
+          aria-controls="mobile-menu"
+          aria-expanded="false"
+          aria-label={ui.nav.menu}
+        >
+          <Icon name="menu" size={20} class="menu-open" />
+          <Icon name="close" size={20} class="menu-close" />
+        </button>
+      </div>
+    </nav>
+
+    <div id="mobile-menu" class="glass mt-2 rounded-3xl p-3 lg:hidden" hidden>
+      <ul class="grid gap-1">
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} class="block rounded-2xl px-4 py-3 text-lg hover:bg-surface-strong">
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={localePath(locale, 'cv/')} class="block rounded-2xl px-4 py-3 text-lg text-accent hover:bg-surface-strong">
+            {ui.nav.cv}
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav-shell {
+    border: 1px solid transparent;
+    transition:
+      background-color 0.5s ease,
+      border-color 0.5s ease,
+      box-shadow 0.5s ease,
+      padding 0.5s ease;
+  }
+
+  :global(:root[data-scrolled]) .nav-shell {
+    background: var(--surface);
+    border-color: var(--border);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    box-shadow: var(--shadow);
+  }
+
+  .nav-link {
+    position: relative;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    color: var(--muted);
+    transition: color 0.3s ease;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.9rem;
+    bottom: 0.3rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s var(--ease-out-expo);
+  }
+
+  .nav-link:hover,
+  .nav-link[aria-current='page'] {
+    color: var(--text);
+  }
+
+  .nav-link:hover::after,
+  .nav-link[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    color: var(--text);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 50%, transparent);
+    cursor: pointer;
+    transition:
+      border-color 0.3s ease,
+      color 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .icon-btn:hover {
+    border-color: var(--gold);
+    color: var(--accent-text);
+  }
+
+  summary.icon-btn {
+    list-style: none;
+  }
+
+  summary.icon-btn::-webkit-details-marker {
+    display: none;
+  }
+
+  .lang-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.9rem;
+    font-size: 0.95rem;
+    font-family: var(--font-sans);
+  }
+
+  .lang-item[lang='ar'] {
+    font-family: var(--font-arabic);
+  }
+
+  .lang-item:hover {
+    background: var(--surface-strong);
+  }
+
+  .lang-item[aria-current] {
+    color: var(--accent-text);
+  }
+
+  /* Theme toggle icons (the svgs live in the Icon component, hence :global) */
+  .icon-btn :global(.theme-icon-moon) {
+    display: none;
+  }
+  :global(:root[data-theme='dawn']) .icon-btn :global(.theme-icon-sun) {
+    display: none;
+  }
+  :global(:root[data-theme='dawn']) .icon-btn :global(.theme-icon-moon) {
+    display: block;
+  }
+
+  /* Menu toggle */
+  @media (min-width: 1024px) {
+    .menu-btn {
+      display: none;
+    }
+  }
+  .menu-btn :global(.menu-close) {
+    display: none;
+  }
+  .menu-btn[aria-expanded='true'] :global(.menu-open) {
+    display: none;
+  }
+  .menu-btn[aria-expanded='true'] :global(.menu-close) {
+    display: block;
+  }
+</style>

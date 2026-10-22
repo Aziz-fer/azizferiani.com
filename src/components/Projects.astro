@@ -1,0 +1,212 @@
+---
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import { categories, projects, type Category } from '../data/projects';
+import { profile } from '../data/profile';
+import { t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const used = Object.keys(categories).filter((c) => projects.some((p) => p.category === c)) as Category[];
+
+const accent: Record<Category, string> = {
+  ai: 'var(--gold)',
+  data: 'var(--sunset)',
+  qa: '#8fb8de',
+  fun: 'var(--rose)',
+};
+---
+
+<section id="projects" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <SectionHeading kicker={ui.projects.kicker} title={ui.projects.title} intro={ui.projects.intro} />
+
+    <div class="mb-10 flex flex-wrap gap-2" data-filters="project-grid" role="group" aria-label={ui.projects.kicker} data-reveal>
+      <button type="button" class="chip" data-filter="all" aria-pressed="true">{ui.projects.all}</button>
+      {
+        used.map((c) => (
+          <button type="button" class="chip" data-filter={c} aria-pressed="false">
+            {categories[c][locale]}
+          </button>
+        ))
+      }
+    </div>
+
+    <ul id="project-grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        projects.map((p, i) => (
+          <li
+            class="project glass flex flex-col rounded-3xl p-6"
+            data-cat={p.category}
+            data-reveal
+            data-spotlight
+            style={`--d: ${(i % 3) * 90}ms; --accent: ${accent[p.category]}; view-transition-name: project-${p.id};`}
+          >
+            <div class="flex items-center justify-between gap-3">
+              <span class="project-cat">{categories[p.category][locale]}</span>
+              {p.repo ? (
+                <a
+                  href={p.repo}
+                  target="_blank"
+                  rel="noopener"
+                  class="project-link"
+                  aria-label={`${ui.projects.code}: ${p.title[locale]}`}
+                >
+                  <Icon name="github" size={18} />
+                </a>
+              ) : (
+                <span class="text-xs text-muted">{ui.projects.noCode}</span>
+              )}
+            </div>
+            <h3 class="font-display mt-5 text-2xl leading-tight font-semibold">
+              {p.repo ? (
+                <a href={p.repo} target="_blank" rel="noopener" class="project-title">
+                  {p.title[locale]}
+                </a>
+              ) : (
+                p.title[locale]
+              )}
+            </h3>
+            <p class="mt-3 flex-1 text-[0.95rem] leading-relaxed text-muted">{p.description[locale]}</p>
+            <ul class="mt-5 flex flex-wrap gap-1.5">
+              {p.tags.map((tag) => (
+                <li class="tag">{tag}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-12 flex justify-center" data-reveal>
+      <a href={profile.links.github} target="_blank" rel="noopener" class="btn btn-ghost">
+        <Icon name="github" size={18} />
+        {ui.projects.seeAll}
+        <Icon name="external" size={16} />
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .chip {
+    padding: 0.55rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 70%, transparent);
+    cursor: pointer;
+    transition:
+      color 0.3s ease,
+      background-color 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .chip:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .chip[aria-pressed='true'] {
+    color: #1a1530;
+    background: linear-gradient(120deg, var(--gold), var(--sunset));
+    border-color: transparent;
+  }
+
+  :global(:root[data-theme='dawn']) .chip[aria-pressed='true'] {
+    color: #fffaf0;
+    background: linear-gradient(120deg, var(--gold-strong), var(--amphora));
+  }
+
+  .project {
+    position: relative;
+    overflow: hidden;
+    transition:
+      border-color 0.4s ease,
+      box-shadow 0.4s ease,
+      translate 0.4s var(--ease-out-expo);
+  }
+
+  .project::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(380px circle at var(--mx, 50%) var(--my, -30%), color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .project::after {
+    content: '';
+    position: absolute;
+    inset-inline: 1.5rem;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.6;
+  }
+
+  .project:hover {
+    translate: 0 -6px;
+    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    box-shadow: 0 30px 60px -30px color-mix(in srgb, var(--accent) 50%, transparent);
+  }
+
+  .project:hover::before {
+    opacity: 1;
+  }
+
+  .project-cat {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  :global(:root[lang='ar']) .project-cat {
+    letter-spacing: 0;
+    font-size: 0.85rem;
+  }
+
+  :global(:root[data-theme='dawn']) .project-cat {
+    color: color-mix(in srgb, var(--accent) 60%, #1d2550);
+  }
+
+  .project-link {
+    display: inline-flex;
+    padding: 0.5rem;
+    border-radius: 999px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease;
+  }
+
+  .project-link:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  .project-title {
+    background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 0 1px;
+    transition: background-size 0.4s var(--ease-out-expo);
+  }
+
+  :global(:root[dir='rtl']) .project-title {
+    background-position: 100% 100%;
+  }
+
+  .project-title:hover {
+    background-size: 100% 1px;
+  }
+</style>

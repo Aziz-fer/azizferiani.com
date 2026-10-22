@@ -1,0 +1,164 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/cormorant-garamond';
+import '@fontsource-variable/cormorant-garamond/wght-italic.css';
+import '@fontsource/amiri/400.css';
+import '@fontsource/amiri/700.css';
+import '@fontsource/aref-ruqaa/400.css';
+import '@fontsource/aref-ruqaa/700.css';
+import '../styles/global.css';
+
+import { ClientRouter } from 'astro:transitions';
+import Sky from '../components/Sky.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { dir, locales, localePath, ogLocale, t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  /** Path without locale prefix ("" for home, "books/" …). Omit on pages without translations (404). */
+  path?: string;
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'profile' | 'book';
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const {
+  locale,
+  title,
+  description,
+  path,
+  image = '/og.png',
+  imageAlt = 'Aziz Feriani',
+  type = 'website',
+  jsonLd,
+  noindex = false,
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://azizferiani.com');
+const canonical = path !== undefined ? new URL(localePath(locale, path), site).href : undefined;
+const imageUrl = new URL(image, site).href;
+const ui = t(locale);
+---
+
+<!doctype html>
+<html lang={locale} dir={dir(locale)} data-theme="night">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Aziz Feriani" />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#0f1530" />
+
+    {canonical && <link rel="canonical" href={canonical} />}
+    {
+      path !== undefined &&
+        locales.map((l) => <link rel="alternate" hreflang={l} href={new URL(localePath(l, path), site).href} />)
+    }
+    {path !== undefined && <link rel="alternate" hreflang="x-default" href={new URL(localePath('en', path), site).href} />}
+
+    <meta property="og:type" content={type === 'book' ? 'book' : type} />
+    <meta property="og:site_name" content="Aziz Feriani" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:locale" content={ogLocale[locale]} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const pick = () => {
+          try {
+            const saved = localStorage.getItem('theme');
+            if (saved === 'night' || saved === 'dawn') return saved;
+          } catch {}
+          return 'night';
+        };
+        root.classList.add('js');
+        root.dataset.theme = pick();
+        if (window.__themeSwap) return;
+        window.__themeSwap = true;
+        document.addEventListener('astro:before-swap', (e) => {
+          const next = e.newDocument.documentElement;
+          next.dataset.theme = pick();
+          next.classList.add('js');
+        });
+      })();
+    </script>
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a href="#main" class="skip-link">{ui.nav.skip}</a>
+    <div class="progress no-print" data-progress aria-hidden="true"></div>
+    <Sky />
+    <Nav locale={locale} path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={locale} path={path} />
+
+    <script>
+      import '../scripts/interactions';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .skip-link {
+    position: fixed;
+    inset-inline-start: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    background: var(--gold);
+    color: #1a1530;
+    font-weight: 600;
+    transition: top 0.3s ease;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  .progress {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 60;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--sunset), var(--rose));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  :root[dir='rtl'] .progress {
+    transform-origin: right;
+  }
+
+  /* Theme switch: circular reveal from the toggle button */
+  :root.theme-switching::view-transition-old(root),
+  :root.theme-switching::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+</style>

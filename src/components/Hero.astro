@@ -1,0 +1,545 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import photo from '../assets/aziz.jpg';
+import { profile } from '../data/profile';
+import { localePath, t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const words = profile.focus[locale];
+
+/* A seamless wave: `periods` humps across 2× the visible width, so translating by -50% loops. */
+function wave(amplitude: number, half: number, y: number, width = 2880) {
+  let d = `M0 ${y}`;
+  for (let x = 0, i = 0; x < width; x += half, i++) {
+    const cy = y + (i % 2 === 0 ? -amplitude : amplitude);
+    d += ` Q${x + half / 2} ${cy} ${x + half} ${y}`;
+  }
+  return `${d} V120 H0 Z`;
+}
+
+const socials = [
+  { href: profile.links.github, icon: 'github', label: 'GitHub' },
+  { href: profile.links.linkedin, icon: 'linkedin', label: 'LinkedIn' },
+  { href: profile.links.instagram, icon: 'instagram', label: 'Instagram' },
+  { href: `mailto:${profile.email}`, icon: 'mail', label: 'Email' },
+] as const;
+---
+
+<section id="top" class="hero relative isolate overflow-hidden">
+  <div class="hero-content mx-auto grid max-w-6xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.3fr_1fr]" data-parallax="0.18">
+    <div class="order-2 text-center lg:order-1 lg:text-start">
+      <p class="kicker justify-center lg:justify-start" data-reveal>{ui.hero.greeting}</p>
+      <h1
+        class="font-display mt-4 text-[clamp(3rem,9vw,6.5rem)] font-semibold leading-[0.95] tracking-tight"
+        data-reveal
+        style="--d: 120ms"
+      >
+        <span class="text-gold-gradient">{profile.name[locale]}</span>
+      </h1>
+      <p class="mt-6 text-xl font-medium sm:text-2xl" data-reveal style="--d: 220ms">{profile.role[locale]}</p>
+      <p class="mt-3 flex flex-wrap items-baseline justify-center gap-x-3 text-lg text-muted lg:justify-start" data-reveal style="--d: 300ms">
+        <span>{ui.hero.focusLabel}:</span>
+        <span class="rotator text-accent" data-rotator aria-hidden="true">
+          {words.map((w, i) => <span data-word class:list={[{ 'is-active': i === 0 }]}>{w}</span>)}
+        </span>
+        <span class="sr-only">{words.join(', ')}</span>
+      </p>
+      <p class="mx-auto mt-6 max-w-xl leading-relaxed text-muted lg:mx-0" data-reveal style="--d: 380ms">
+        {profile.intro[locale]}
+      </p>
+      <div class="mt-9 flex flex-wrap justify-center gap-3 lg:justify-start" data-reveal style="--d: 460ms">
+        <a class="btn btn-primary" href="#projects">
+          {ui.hero.viewWork}
+          <Icon name="arrow" size={18} class="rtl:-scale-x-100" />
+        </a>
+        <a class="btn btn-ghost" href={localePath(locale, 'books/carthage/')}>
+          <Icon name="book" size={18} />
+          {ui.hero.readNovel}
+        </a>
+        <a class="btn btn-ghost" href={localePath(locale, 'cv/')}>{ui.nav.cv}</a>
+      </div>
+      <div class="mt-8 flex justify-center gap-2 lg:justify-start" data-reveal style="--d: 540ms">
+        {
+          socials.map((s) => (
+            <a
+              href={s.href}
+              class="hero-social"
+              aria-label={s.label}
+              target={s.icon === 'mail' ? undefined : '_blank'}
+              rel={s.icon === 'mail' ? undefined : 'noopener'}
+            >
+              <Icon name={s.icon} size={18} />
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="order-1 flex justify-center lg:order-2" data-reveal="scale" style="--d: 150ms">
+      <div class="portrait" data-tilt="8">
+        <span class="portrait-halo" aria-hidden="true"></span>
+        <span class="portrait-orbit" aria-hidden="true"><span class="portrait-moon"></span></span>
+        <span class="portrait-ring" aria-hidden="true"></span>
+        <Image
+          src={photo}
+          alt={profile.name[locale]}
+          width={400}
+          height={400}
+          class="portrait-img"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <span class="portrait-badge glass">
+          <span class="pulse" aria-hidden="true"></span>
+          RGU GmbH · Dortmund
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scene" aria-hidden="true" dir="ltr">
+    <div class="horizon-glow"></div>
+    <div class="byrsa" data-parallax="0.06">
+      <svg viewBox="0 0 600 80" preserveAspectRatio="xMinYMax meet">
+        <path
+          d="M0 80V66l60-2 30-6 20 6 60-2c40-32 120-36 160-6l50 2 25-8 25 8 90 2 40-6 40 8v18Z M240 34l15-10 15 10Z M243 34h24v9h-24Z"
+        ></path>
+      </svg>
+    </div>
+    <div class="ship-track">
+      <svg class="ship" viewBox="0 0 120 90">
+        <path d="M60 70V10" stroke-width="2.4"></path>
+        <path d="M60 11 14 69M60 11l46 58" stroke-width="0.7" opacity="0.7"></path>
+        <path class="sail" d="M35 16h50l-3 42H38Z"></path>
+        <path class="hull" d="M6 68q54 12 108 0l-9 10q-45 9-90 0Z"></path>
+        <path d="M24 77l-6 8M36 79l-5 8M48 80l-4 8M60 80v8M72 80l4 8M84 79l5 8M96 77l6 8" stroke-width="1.2"></path>
+      </svg>
+    </div>
+    <div class="sea">
+      <div class="reflection"></div>
+      <div class="wave-row w1"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(7, 180, 30)}></path></svg></div>
+      <div class="wave-row w2"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(10, 240, 50)}></path></svg></div>
+      <div class="wave-row w3"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(12, 320, 70)}></path></svg></div>
+    </div>
+  </div>
+
+  <a href="#about" class="scroll-cue no-print" aria-label={ui.hero.scroll}>
+    <span class="text-xs tracking-[0.3em] uppercase">{ui.hero.scroll}</span>
+    <span class="scroll-line"></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    min-height: 100svh;
+    padding-top: clamp(7rem, 14vh, 9rem);
+    padding-bottom: clamp(13rem, 30vh, 17rem);
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-content {
+    width: 100%;
+    will-change: transform;
+  }
+
+  .hero-social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 999px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    transition:
+      color 0.3s ease,
+      border-color 0.3s ease,
+      transform 0.3s var(--ease-out-expo);
+  }
+
+  .hero-social:hover {
+    color: var(--accent-text);
+    border-color: var(--gold);
+    transform: translateY(-3px);
+  }
+
+  /* Rotating words: every word sits in the same grid cell, so the width never jumps. */
+  .rotator {
+    display: inline-grid;
+    justify-items: center;
+    font-weight: 600;
+  }
+
+  @media (min-width: 1024px) {
+    .rotator {
+      justify-items: start;
+    }
+  }
+
+  .rotator > span {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(0.6em);
+    filter: blur(4px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s var(--ease-out-expo),
+      filter 0.6s ease;
+  }
+
+  .rotator > span.is-active {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .rotator > span.is-leaving {
+    transform: translateY(-0.6em);
+  }
+
+  /* Portrait */
+  .portrait {
+    position: relative;
+    width: min(70vw, 330px);
+    aspect-ratio: 1;
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+    transition: transform 0.6s var(--ease-out-expo);
+  }
+
+  .portrait:global(.is-tilting) {
+    transition: transform 0.1s linear;
+  }
+
+  .portrait-halo {
+    position: absolute;
+    inset: -30%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--glow) 0%, color-mix(in srgb, var(--rose) 18%, transparent) 40%, transparent 68%);
+    filter: blur(10px);
+    animation: breathe 6s ease-in-out infinite;
+  }
+
+  .portrait-ring {
+    position: absolute;
+    inset: -9px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--gold), var(--sunset), var(--rose), transparent 55%, var(--gold));
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+    animation: spin 10s linear infinite;
+  }
+
+  .portrait-orbit {
+    position: absolute;
+    inset: -34px;
+    border-radius: 50%;
+    border: 1px dashed var(--border-strong);
+    animation: spin 40s linear infinite reverse;
+  }
+
+  .portrait-moon {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow:
+      0 0 12px 3px var(--glow),
+      0 0 30px 6px var(--glow);
+  }
+
+  .portrait :global(.portrait-img) {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.55);
+  }
+
+  .portrait-badge {
+    position: absolute;
+    bottom: 4%;
+    inset-inline-start: -6%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    direction: ltr;
+  }
+
+  .pulse {
+    position: relative;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #7fd6a4;
+  }
+
+  .pulse::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid #7fd6a4;
+    animation: ping 2s ease-out infinite;
+  }
+
+  /* Scene: horizon, Byrsa, ship and sea */
+  .scene {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: clamp(11rem, 28vh, 15rem);
+    z-index: -1;
+    pointer-events: none;
+    --horizon: 42%;
+  }
+
+  .horizon-glow {
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    bottom: calc(100% - var(--horizon) - 2px);
+    height: 90%;
+    background:
+      radial-gradient(60% 100% at 32% 100%, color-mix(in srgb, var(--sunset) 70%, transparent), transparent 70%),
+      radial-gradient(90% 120% at 50% 100%, color-mix(in srgb, var(--rose) 45%, transparent), transparent 75%);
+    opacity: 0.85;
+  }
+
+  :global(:root[data-theme='dawn']) .horizon-glow {
+    opacity: 0.55;
+  }
+
+  .byrsa {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% - var(--horizon) - 1px);
+    width: min(55vw, 640px);
+    fill: var(--silhouette);
+  }
+
+  .byrsa svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .ship-track {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% - var(--horizon) - 6px);
+    width: 100%;
+    animation: sail 110s linear -62s infinite;
+  }
+
+  .ship {
+    width: clamp(56px, 7vw, 92px);
+    stroke: var(--ship, #241f45);
+    fill: none;
+    animation: bob 5s ease-in-out infinite;
+    transform-origin: 50% 80%;
+  }
+
+  .ship .sail,
+  .ship .hull {
+    fill: var(--ship, #241f45);
+    stroke: none;
+  }
+
+  :global(:root[data-theme='dawn']) .ship {
+    --ship: #5e4d63;
+  }
+
+  .sea {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: calc(100% - var(--horizon));
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sea-1) 72%, var(--sunset)) 0%,
+      var(--sea-1) 28%,
+      var(--sea-3) 100%
+    );
+    -webkit-mask: linear-gradient(180deg, #000 55%, transparent);
+    mask: linear-gradient(180deg, #000 55%, transparent);
+    overflow: hidden;
+  }
+
+  .reflection {
+    position: absolute;
+    top: 0;
+    left: 26%;
+    width: clamp(90px, 14vw, 180px);
+    height: 100%;
+    background: repeating-linear-gradient(180deg, rgb(243 217 164 / 0.55) 0 2px, transparent 2px 9px);
+    -webkit-mask: radial-gradient(50% 100% at 50% 0%, #000 0%, transparent 100%);
+    mask: radial-gradient(50% 100% at 50% 0%, #000 0%, transparent 100%);
+    animation: glitter 3.5s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .wave-row {
+    position: absolute;
+    left: 0;
+    width: 200%;
+    height: 100%;
+    top: 0;
+  }
+
+  .wave-row svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .w1 {
+    fill: var(--sea-1);
+    opacity: 0.85;
+    animation: drift 38s linear infinite;
+  }
+
+  .w2 {
+    top: 18%;
+    fill: var(--sea-2);
+    opacity: 0.9;
+    animation: drift 28s linear infinite reverse;
+  }
+
+  .w3 {
+    top: 36%;
+    fill: var(--sea-3);
+    animation: drift 22s linear infinite;
+  }
+
+  .scroll-cue {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--muted);
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 42px;
+    background: linear-gradient(180deg, var(--gold), transparent);
+    animation: scroll-hint 2.2s ease-in-out infinite;
+    transform-origin: top;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 0.7;
+      transform: scale(0.96);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.04);
+    }
+  }
+
+  @keyframes ping {
+    from {
+      transform: scale(0.6);
+      opacity: 1;
+    }
+    to {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes sail {
+    from {
+      transform: translateX(105vw);
+    }
+    to {
+      transform: translateX(-15vw);
+    }
+  }
+
+  @keyframes bob {
+    0%,
+    100% {
+      transform: translateY(0) rotate(-1.2deg);
+    }
+    50% {
+      transform: translateY(2px) rotate(1.2deg);
+    }
+  }
+
+  @keyframes drift {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes glitter {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scaleX(1);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scaleX(1.12);
+    }
+  }
+
+  @keyframes scroll-hint {
+    0% {
+      transform: scaleY(0);
+      opacity: 1;
+    }
+    60% {
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scaleY(1);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .scroll-cue {
+      display: none;
+    }
+    .portrait-badge {
+      inset-inline-start: 50%;
+      translate: -50% 0;
+      bottom: -14%;
+    }
+    :global(:root[dir='rtl']) .portrait-badge {
+      translate: 50% 0;
+    }
+  }
+</style>

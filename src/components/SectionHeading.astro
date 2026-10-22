@@ -1,0 +1,25 @@
+---
+interface Props {
+  kicker: string;
+  title: string;
+  intro?: string;
+  center?: boolean;
+  as?: 'h1' | 'h2';
+}
+
+const { kicker, title, intro, center = false, as: Tag = 'h2' } = Astro.props;
+---
+
+<header class:list={['mb-12 max-w-3xl', { 'mx-auto text-center': center }]}>
+  <p class:list={['kicker', { 'justify-center': center }]} data-reveal>{kicker}</p>
+  <Tag class="font-display mt-4 text-[clamp(2.3rem,5vw,3.75rem)] font-semibold leading-[1.05]" data-reveal style="--d: 100ms">
+    {title}
+  </Tag>
+  {
+    intro && (
+      <p class="mt-5 text-lg leading-relaxed text-muted" data-reveal style="--d: 180ms">
+        {intro}
+      </p>
+    )
+  }
+</header>

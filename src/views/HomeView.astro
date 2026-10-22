@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import Journey from '../components/Journey.astro';
+import Projects from '../components/Projects.astro';
+import Skills from '../components/Skills.astro';
+import BookTeaser from '../components/BookTeaser.astro';
+import Contact from '../components/Contact.astro';
+import { profile } from '../data/profile';
+import { t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const site = Astro.site?.href ?? 'https://azizferiani.com/';
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Aziz Feriani',
+  alternateName: [profile.fullNameLatin, profile.name.ar],
+  url: site,
+  image: new URL('/og.png', site).href,
+  email: `mailto:${profile.email}`,
+  jobTitle: profile.role.en,
+  worksFor: { '@type': 'Organization', name: 'RGU GmbH' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'TU Dortmund University' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Dortmund', addressCountry: 'DE' },
+  knowsLanguage: ['ar', 'de', 'en', 'fr'],
+  sameAs: [profile.links.github, profile.links.linkedin, profile.links.instagram],
+};
+---
+
+<Base
+  locale={locale}
+  title={ui.meta.homeTitle}
+  description={ui.meta.homeDescription}
+  path=""
+  type="profile"
+  jsonLd={person}
+>
+  <Hero locale={locale} />
+  <About locale={locale} />
+  <Journey locale={locale} />
+  <Projects locale={locale} />
+  <Skills locale={locale} />
+  <BookTeaser locale={locale} />
+  <Contact locale={locale} />
+</Base>

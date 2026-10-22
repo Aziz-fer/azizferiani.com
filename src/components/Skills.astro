@@ -1,0 +1,200 @@
+---
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import { certifications, marquee, skillGroups, spokenLanguages } from '../data/profile';
+import { formatMonth, t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const half = Math.ceil(marquee.length / 2);
+const rows = [marquee.slice(0, half), marquee.slice(half)];
+---
+
+<section id="skills" class="relative py-24 sm:py-32">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <SectionHeading kicker={ui.skills.kicker} title={ui.skills.title} />
+  </div>
+
+  <div class="ribbon no-print" aria-hidden="true" dir="ltr">
+    {
+      rows.map((row, r) => (
+        <div class:list={['ribbon-row', { reverse: r === 1 }]}>
+          {[0, 1].map(() => (
+            <ul class="ribbon-track">
+              {row.map((s) => (
+                <li>
+                  <Icon name="sparkle" size={14} class="text-gold" />
+                  {s}
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="mx-auto mt-14 max-w-6xl px-4 sm:px-6">
+    <div class="grid gap-5 md:grid-cols-2" data-stagger="90">
+      {
+        skillGroups.map((g) => (
+          <article class="glass rounded-3xl p-6 sm:p-7" data-reveal>
+            <h3 class="font-display text-2xl font-semibold">{g.title[locale]}</h3>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {g.items.map((s) => (
+                <li class="skill">{s}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="glass mt-5 rounded-3xl p-6 sm:p-7" data-reveal>
+      <h3 class="font-display text-2xl font-semibold">{ui.skills.spoken}</h3>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          spokenLanguages.map((l) => (
+            <li class="rounded-2xl border border-line px-4 py-3">
+              <p class="font-semibold">{l.name[locale]}</p>
+              <p class="text-sm text-muted">{l.level[locale]}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="certifications" class="relative py-16 sm:py-24">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <SectionHeading kicker={ui.certs.kicker} title={ui.certs.title} />
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-stagger="60">
+      {
+        certifications.map((c) => (
+          <li class="cert glass flex gap-4 rounded-2xl p-5" data-reveal data-spotlight>
+            <span class="cert-icon" aria-hidden="true">
+              <Icon name="award" size={20} />
+            </span>
+            <div class="min-w-0" dir="ltr" lang="en">
+              <p class="font-semibold leading-snug">
+                {c.name}
+                {c.honors && <span class="ms-1 text-accent">★</span>}
+              </p>
+              <p class="mt-1 text-sm text-muted">
+                {c.issuer} · <span dir="auto">{formatMonth(c.date, locale)}</span>
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ribbon {
+    display: grid;
+    gap: 0.9rem;
+    -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    overflow: hidden;
+  }
+
+  .ribbon-row {
+    display: flex;
+    width: max-content;
+    animation: marquee 45s linear infinite;
+  }
+
+  .ribbon-row.reverse {
+    animation-direction: reverse;
+    animation-duration: 55s;
+  }
+
+  .ribbon:hover .ribbon-row {
+    animation-play-state: paused;
+  }
+
+  .ribbon-track {
+    display: flex;
+    gap: 0.9rem;
+    padding-inline-end: 0.9rem;
+  }
+
+  .ribbon-track li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.35rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .skill {
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    border: 1px solid var(--border);
+    direction: ltr;
+    transition:
+      border-color 0.3s ease,
+      color 0.3s ease,
+      box-shadow 0.3s ease,
+      transform 0.3s var(--ease-out-expo);
+  }
+
+  .skill:hover {
+    color: var(--accent-text);
+    border-color: var(--gold);
+    box-shadow: 0 6px 20px -8px var(--glow);
+    transform: translateY(-2px);
+  }
+
+  .cert {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cert::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), var(--glow), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .cert:hover::before {
+    opacity: 0.5;
+  }
+
+  .cert-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 0.9rem;
+    color: var(--accent-text);
+    background: color-mix(in srgb, var(--gold) 14%, transparent);
+    border: 1px solid var(--border-strong);
+  }
+</style>

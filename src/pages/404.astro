@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { locales, localeNames, localePath, t } from '../i18n/ui';
+
+const ui = t('en');
+---
+
+<Base locale="en" title={ui.meta.notFoundTitle} description={ui.notFound.text} noindex>
+  <section class="flex min-h-[85svh] items-center justify-center px-4 pt-28 pb-16 text-center">
+    <div>
+      <div class="lost-ship" aria-hidden="true">
+        <svg viewBox="0 0 120 90" width="140">
+          <path d="M60 70V10" stroke="currentColor" stroke-width="2.4" fill="none"></path>
+          <path d="M35 16h50l-3 42H38Z" fill="currentColor"></path>
+          <path d="M6 68q54 12 108 0l-9 10q-45 9-90 0Z" fill="currentColor"></path>
+        </svg>
+      </div>
+      <p class="font-display text-[clamp(5rem,18vw,10rem)] leading-none font-semibold text-gold-gradient">404</p>
+      {
+        locales.map((l) => (
+          <div lang={l} dir={l === 'ar' ? 'rtl' : 'ltr'} class="mt-6">
+            <h1 class="font-display text-3xl font-semibold">{t(l).notFound.title}</h1>
+            <p class="mx-auto mt-2 max-w-md text-muted">{t(l).notFound.text}</p>
+          </div>
+        ))
+      }
+      <div class="mt-10 flex flex-wrap justify-center gap-3">
+        {
+          locales.map((l) => (
+            <a href={localePath(l, '')} class={l === 'en' ? 'btn btn-primary' : 'btn btn-ghost'} lang={l} data-astro-reload>
+              <Icon name="arrow" size={18} class={l === 'ar' ? '-scale-x-100' : ''} />
+              {t(l).notFound.home}
+              <span class="text-xs opacity-60">{localeNames[l].short}</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .lost-ship {
+    display: flex;
+    justify-content: center;
+    color: var(--gold);
+    opacity: 0.85;
+    animation: adrift 6s ease-in-out infinite;
+  }
+
+  @keyframes adrift {
+    0%,
+    100% {
+      transform: translateX(-12px) rotate(-6deg);
+    }
+    50% {
+      transform: translateX(12px) rotate(5deg);
+    }
+  }
+</style>

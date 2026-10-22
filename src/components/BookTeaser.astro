@@ -1,0 +1,83 @@
+---
+import { getCollection } from 'astro:content';
+import BookCover3D from './BookCover3D.astro';
+import Icon from './Icon.astro';
+import TranslationNote from './TranslationNote.astro';
+import { localePath, t, type Locale } from '../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const ui = t(locale);
+const [book] = (await getCollection('books')).sort((a, b) => a.data.order - b.data.order);
+---
+
+{
+  book && (
+    <section id="book" class="teaser relative overflow-hidden py-24 sm:py-32">
+      <div class="teaser-glow" aria-hidden="true" />
+      <div class="mx-auto grid max-w-6xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_1.15fr]">
+        <div class="flex justify-center" data-reveal="scale">
+          <a href={localePath(locale, `books/${book.id}/`)} aria-label={book.data.title}>
+            <BookCover3D cover={book.data.cover} alt={book.data.title} width={320} />
+          </a>
+        </div>
+
+        <div class="text-center lg:text-start">
+          <p class="kicker justify-center lg:justify-start" data-reveal>
+            {ui.book.kicker}
+          </p>
+          <h2
+            class="mt-5 text-[clamp(2.6rem,6vw,4.2rem)] leading-[1.25] text-gold-gradient"
+            style="font-family: var(--font-ruqaa); --d: 100ms"
+            lang="ar"
+            data-reveal
+          >
+            {book.data.title}
+          </h2>
+          {locale !== 'ar' && (
+            <p class="font-display mt-2 text-2xl italic text-muted" data-reveal style="--d: 160ms">
+              {book.data.titleTranslations[locale]}
+            </p>
+          )}
+          <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed lg:mx-0" data-reveal style="--d: 220ms">
+            {book.data.tagline[locale]}
+          </p>
+          <p class="mt-4 text-sm text-muted" data-reveal style="--d: 260ms">
+            {book.data.genre[locale]} · {book.data.chapters} {ui.bookPage.chapters} · {book.data.pages} {ui.bookPage.pages} ·{' '}
+            {book.data.gallery.length} {ui.bookPage.illustrations}
+          </p>
+          {book.data.translationsComing && (
+            <div class="mt-4" data-reveal style="--d: 290ms">
+              <TranslationNote locale={locale} />
+            </div>
+          )}
+          <div class="mt-9 flex flex-wrap justify-center gap-3 lg:justify-start" data-reveal style="--d: 320ms">
+            <a class="btn btn-primary" href={localePath(locale, `books/${book.id}/`)}>
+              {ui.book.discover}
+              <Icon name="arrow" size={18} class="rtl:-scale-x-100" />
+            </a>
+            <a class="btn btn-ghost" href={book.data.pdf.href} download={book.data.pdf.downloadName}>
+              <Icon name="download" size={18} />
+              {ui.book.download}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .teaser-glow {
+    position: absolute;
+    inset: 10% -20%;
+    z-index: -1;
+    background:
+      radial-gradient(40% 50% at 28% 55%, color-mix(in srgb, var(--sunset) 22%, transparent), transparent 70%),
+      radial-gradient(45% 55% at 70% 45%, color-mix(in srgb, var(--rose) 20%, transparent), transparent 70%);
+    filter: blur(20px);
+  }
+</style>
