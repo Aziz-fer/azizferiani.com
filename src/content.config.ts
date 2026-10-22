@@ -27,6 +27,8 @@ const books = defineCollection({
       gallery: z.array(z.object({ src: image(), caption: z.string(), chapter: z.number() })).default([]),
       /** Bookshelf order: lower comes first. */
       order: z.number().default(0),
+      /** Social preview image in public/ (1200×630). Falls back to the site-wide one. */
+      ogImage: z.string().default('/og.png'),
       /** Shows "translations are coming in a future update". */
       translationsComing: z.boolean().default(false),
     }),

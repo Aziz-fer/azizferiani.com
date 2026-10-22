@@ -35,6 +35,7 @@ Every text has an `en`, `de` and `ar` version. Change all three, and the matchin
    - The text after the second `---` is the excerpt shown under "Read the opening".
    - Set `order` to choose the book's position on the shelf.
    - Set `translationsComing: false` once a translation exists.
+   - Optional: put a 1200×630 preview image for social media in `public/` and point `ogImage` at it. Without one, the site's main preview image is used.
 4. Run `npm run build`. The bookshelf, the book page in all three languages and the sitemap update automatically.
 
 ## Pages

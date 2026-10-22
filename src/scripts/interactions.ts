@@ -242,19 +242,29 @@ function initRotator(signal: AbortSignal) {
   }
 }
 
-/* ---------- 3D tilt (book covers, photo) ---------- */
+/* ---------- 3D tilt (book covers, photo, project cards) ----------
+   Elements read --rx/--ry in their own transform. Elements marked [data-tilt-rotate]
+   already use `transform` for the scroll reveal, so they get the `rotate` property instead. */
 function initTilt(signal: AbortSignal) {
   if (!finePointer() || reduced()) return;
   for (const el of document.querySelectorAll<HTMLElement>('[data-tilt]')) {
     const max = Number(el.dataset.tilt) || 12;
+    const useRotate = el.hasAttribute('data-tilt-rotate');
     el.addEventListener(
       'pointermove',
       (e) => {
         const r = el.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width;
         const py = (e.clientY - r.top) / r.height;
-        el.style.setProperty('--ry', `${(px - 0.5) * max * 2}deg`);
-        el.style.setProperty('--rx', `${(0.5 - py) * max * 2}deg`);
+        const ry = (px - 0.5) * max * 2;
+        const rx = (0.5 - py) * max * 2;
+        if (useRotate) {
+          const angle = Math.hypot(rx, ry);
+          el.style.rotate = angle > 0.01 ? `${rx} ${ry} 0 ${angle}deg` : '';
+        } else {
+          el.style.setProperty('--ry', `${ry}deg`);
+          el.style.setProperty('--rx', `${rx}deg`);
+        }
         el.style.setProperty('--gx', `${px * 100}%`);
         el.style.setProperty('--gy', `${py * 100}%`);
         el.classList.add('is-tilting');
@@ -266,6 +276,7 @@ function initTilt(signal: AbortSignal) {
       () => {
         el.style.removeProperty('--rx');
         el.style.removeProperty('--ry');
+        el.style.rotate = '';
         el.classList.remove('is-tilting');
       },
       { signal },

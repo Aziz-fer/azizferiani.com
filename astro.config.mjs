@@ -7,6 +7,8 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://azizferiani.com',
   trailingSlash: 'ignore',
+  // Inline the CSS so the first paint doesn't wait for extra stylesheet requests.
+  build: { inlineStylesheets: 'always' },
   i18n: {
     locales: ['en', 'de', 'ar'],
     defaultLocale: 'en',

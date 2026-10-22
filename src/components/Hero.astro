@@ -34,26 +34,26 @@ const socials = [
 <section id="top" class="hero relative isolate overflow-hidden">
   <div class="hero-content mx-auto grid max-w-6xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.3fr_1fr]" data-parallax="0.18">
     <div class="order-2 text-center lg:order-1 lg:text-start">
-      <p class="kicker justify-center lg:justify-start" data-reveal>{ui.hero.greeting}</p>
+      <p class="kicker justify-center lg:justify-start" data-enter>{ui.hero.greeting}</p>
       <h1
         class="font-display mt-4 text-[clamp(3rem,9vw,6.5rem)] font-semibold leading-[0.95] tracking-tight"
-        data-reveal
+        data-enter
         style="--d: 120ms"
       >
         <span class="text-gold-gradient">{profile.name[locale]}</span>
       </h1>
-      <p class="mt-6 text-xl font-medium sm:text-2xl" data-reveal style="--d: 220ms">{profile.role[locale]}</p>
-      <p class="mt-3 flex flex-wrap items-baseline justify-center gap-x-3 text-lg text-muted lg:justify-start" data-reveal style="--d: 300ms">
+      <p class="mt-6 text-xl font-medium sm:text-2xl" data-enter style="--d: 220ms">{profile.role[locale]}</p>
+      <p class="mt-3 flex flex-wrap items-baseline justify-center gap-x-3 text-lg text-muted lg:justify-start" data-enter style="--d: 300ms">
         <span>{ui.hero.focusLabel}:</span>
         <span class="rotator text-accent" data-rotator aria-hidden="true">
           {words.map((w, i) => <span data-word class:list={[{ 'is-active': i === 0 }]}>{w}</span>)}
         </span>
         <span class="sr-only">{words.join(', ')}</span>
       </p>
-      <p class="mx-auto mt-6 max-w-xl leading-relaxed text-muted lg:mx-0" data-reveal style="--d: 380ms">
+      <p class="mx-auto mt-6 max-w-xl leading-relaxed text-muted lg:mx-0" data-enter style="--d: 380ms">
         {profile.intro[locale]}
       </p>
-      <div class="mt-9 flex flex-wrap justify-center gap-3 lg:justify-start" data-reveal style="--d: 460ms">
+      <div class="mt-9 flex flex-wrap justify-center gap-3 lg:justify-start" data-enter style="--d: 460ms">
         <a class="btn btn-primary" href="#projects">
           {ui.hero.viewWork}
           <Icon name="arrow" size={18} class="rtl:-scale-x-100" />
@@ -64,7 +64,7 @@ const socials = [
         </a>
         <a class="btn btn-ghost" href={localePath(locale, 'cv/')}>{ui.nav.cv}</a>
       </div>
-      <div class="mt-8 flex justify-center gap-2 lg:justify-start" data-reveal style="--d: 540ms">
+      <div class="mt-8 flex justify-center gap-2 lg:justify-start" data-enter style="--d: 540ms">
         {
           socials.map((s) => (
             <a
@@ -81,7 +81,7 @@ const socials = [
       </div>
     </div>
 
-    <div class="order-1 flex justify-center lg:order-2" data-reveal="scale" style="--d: 150ms">
+    <div class="order-1 flex justify-center lg:order-2" data-enter="scale" style="--d: 150ms">
       <div class="portrait" data-tilt="8">
         <span class="portrait-halo" aria-hidden="true"></span>
         <span class="portrait-orbit" aria-hidden="true"><span class="portrait-moon"></span></span>
@@ -123,9 +123,16 @@ const socials = [
     </div>
     <div class="sea">
       <div class="reflection"></div>
-      <div class="wave-row w1"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(7, 180, 30)}></path></svg></div>
-      <div class="wave-row w2"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(10, 240, 50)}></path></svg></div>
-      <div class="wave-row w3"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(12, 320, 70)}></path></svg></div>
+      <!-- Each wave drifts sideways (CSS) inside a layer that moves with scroll (JS), so the transforms never clash. -->
+      <div class="wave-layer" data-parallax="0.03">
+        <div class="wave-row w1"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(7, 180, 30)}></path></svg></div>
+      </div>
+      <div class="wave-layer" data-parallax="0.07">
+        <div class="wave-row w2"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(10, 240, 50)}></path></svg></div>
+      </div>
+      <div class="wave-layer" data-parallax="0.12">
+        <div class="wave-row w3"><svg viewBox="0 0 2880 120" preserveAspectRatio="none"><path d={wave(12, 320, 70)}></path></svg></div>
+      </div>
     </div>
   </div>
 
@@ -393,6 +400,11 @@ const socials = [
     mask: radial-gradient(50% 100% at 50% 0%, #000 0%, transparent 100%);
     animation: glitter 3.5s ease-in-out infinite;
     z-index: 1;
+  }
+
+  .wave-layer {
+    position: absolute;
+    inset: 0;
   }
 
   .wave-row {

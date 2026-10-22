@@ -10,6 +10,7 @@ year: 2026
 lang: ar
 order: 1
 translationsComing: true
+ogImage: /og-carthage.png
 genre:
   en: Historical novel
   de: Historischer Roman

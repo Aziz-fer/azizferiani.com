@@ -22,17 +22,20 @@ const period = (start: string, end: string | undefined, yearsOnly?: boolean) => 
   return `${fmt(start)} – ${end ? fmt(end) : ui.journey.present}`;
 };
 
+/** The printed label must be the real address: "https://www.x.com/a/" → "x.com/a". */
+const bare = (url: string) => url.replace(/^https:\/\/(www\.)?/, '').replace(/\/$/, '');
+
 const contacts = [
   { icon: 'mail', label: profile.email, href: `mailto:${profile.email}` },
   { icon: 'globe', label: 'azizferiani.com', href: 'https://azizferiani.com' },
-  { icon: 'linkedin', label: 'linkedin.com/in/aziz-feriani', href: profile.links.linkedin },
-  { icon: 'github', label: 'github.com/Aziz-fer', href: profile.links.github },
+  { icon: 'linkedin', label: bare(profile.links.linkedin), href: profile.links.linkedin },
+  { icon: 'github', label: bare(profile.links.github), href: profile.links.github },
   { icon: 'pin', label: profile.facts.based[locale], href: undefined },
 ] as const;
 ---
 
 <Base locale={locale} title={ui.meta.cvTitle} description={ui.meta.cvDescription} path="cv/">
-  <div class="mx-auto max-w-[900px] px-3 pt-28 pb-10 sm:px-6 sm:pt-32">
+  <div class="mx-auto max-w-[900px] px-3 pt-28 pb-10 sm:px-6 sm:pt-32 print:max-w-none print:p-0">
     <div class="no-print mb-6 flex flex-wrap items-center justify-between gap-3">
       <a href={localePath(locale, '')} class="inline-flex items-center gap-2 text-sm text-muted hover:text-accent">
         <Icon name="chevron-left" size={16} class="rtl:-scale-x-100" />

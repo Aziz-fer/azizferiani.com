@@ -48,7 +48,7 @@ const jsonLd = {
   title={title}
   description={b.tagline[locale]}
   path={`books/${book.id}/`}
-  image={`/og-${book.id}.png`}
+  image={b.ogImage}
   imageAlt={b.title}
   type="book"
   jsonLd={jsonLd}
@@ -57,43 +57,43 @@ const jsonLd = {
   <section class="book-hero relative isolate overflow-hidden pt-32 pb-24 sm:pt-40">
     <div class="book-backdrop" style={`background-image: url(${backdrop.src})`} aria-hidden="true"></div>
     <div class="mx-auto grid max-w-6xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_1.2fr]">
-      <div class="flex justify-center" data-reveal="scale">
+      <div class="flex justify-center" data-enter="scale">
         <BookCover3D cover={b.cover} alt={b.title} width={340} rtl={b.lang === 'ar'} eager />
       </div>
 
       <div class="text-center lg:text-start">
-        <div data-reveal>
+        <div data-enter>
           <a href={localePath(locale, 'books/')} class="inline-flex items-center gap-2 text-sm text-muted hover:text-accent">
             <Icon name="chevron-left" size={16} class="rtl:-scale-x-100" />
             {ui.bookPage.back}
           </a>
         </div>
-        <p class="kicker mt-6 justify-center lg:justify-start" data-reveal>{b.genre[locale]}</p>
+        <p class="kicker mt-6 justify-center lg:justify-start" data-enter>{b.genre[locale]}</p>
         <h1
           class="mt-4 text-[clamp(3rem,8vw,5.2rem)] leading-[1.2] text-gold-gradient"
           style="font-family: var(--font-ruqaa); --d: 100ms"
           lang={b.lang}
-          data-reveal
+          data-enter
         >
           {b.title}
         </h1>
         {
           locale !== b.lang && (
-            <p class="font-display mt-1 text-2xl italic text-muted sm:text-3xl" data-reveal style="--d: 150ms">
+            <p class="font-display mt-1 text-2xl italic text-muted sm:text-3xl" data-enter style="--d: 150ms">
               {b.titleTranslations[locale]}
             </p>
           )
         }
-        <p class="mt-5 text-lg" data-reveal style="--d: 200ms">
+        <p class="mt-5 text-lg" data-enter style="--d: 200ms">
           {ui.bookPage.by}
-          <span lang="ar" class="mx-1 text-accent" style="font-family: var(--font-arabic)">{b.author}</span>
+          <span lang="ar" class="mx-1 text-xl text-accent" style="font-family: var(--font-ruqaa)">{b.author}</span>
           {locale !== 'ar' && <span class="text-muted">({b.authorLatin})</span>}
         </p>
-        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted lg:mx-0" data-reveal style="--d: 260ms">
+        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted lg:mx-0" data-enter style="--d: 260ms">
           {b.tagline[locale]}
         </p>
 
-        <ul class="mt-8 flex flex-wrap justify-center gap-2 lg:justify-start" data-reveal style="--d: 320ms">
+        <ul class="mt-8 flex flex-wrap justify-center gap-2 lg:justify-start" data-enter style="--d: 320ms">
           <li class="pill"><strong>{b.pages}</strong> {ui.bookPage.pages}</li>
           <li class="pill"><strong>{b.chapters}</strong> {ui.bookPage.chapters}</li>
           <li class="pill"><strong>{b.gallery.length}</strong> {ui.bookPage.illustrations}</li>
@@ -101,13 +101,13 @@ const jsonLd = {
         </ul>
         {
           b.translationsComing && (
-            <div class="mt-4" data-reveal style="--d: 350ms">
+            <div class="mt-4" data-enter style="--d: 350ms">
               <TranslationNote locale={locale} />
             </div>
           )
         }
 
-        <div class="mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start" data-reveal style="--d: 380ms">
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-3 lg:justify-start" data-enter style="--d: 380ms">
           <a class="btn btn-primary download" href={b.pdf.href} download={b.pdf.downloadName}>
             <Icon name="download" size={20} />
             <span class="text-start">
@@ -122,7 +122,7 @@ const jsonLd = {
   </section>
 
   <!-- About the novel -->
-  <section class="py-20">
+  <section class="defer-render py-20">
     <div class="mx-auto grid max-w-6xl gap-8 px-4 sm:px-6 lg:grid-cols-[1.3fr_1fr]">
       <div>
         <p class="kicker" data-reveal>{ui.bookPage.about}</p>
@@ -148,7 +148,7 @@ const jsonLd = {
   </section>
 
   <!-- Opening pages -->
-  <section id="opening" class="py-20">
+  <section id="opening" class="defer-render py-20">
     <div class="mx-auto max-w-3xl px-4 sm:px-6">
       <div class="text-center" data-reveal><p class="kicker">{ui.bookPage.opening}</p></div>
       <article class="excerpt glass mt-8 rounded-[2rem] px-6 py-12 sm:px-14" lang={b.lang} dir="rtl" data-reveal>
@@ -170,7 +170,7 @@ const jsonLd = {
   <!-- Illustrations -->
   {
     gallery.length > 0 && (
-      <section class="py-20">
+      <section class="defer-render py-20">
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
           <p class="kicker" data-reveal>
             {ui.bookPage.gallery}
@@ -185,9 +185,8 @@ const jsonLd = {
                   data-full={g.full}
                   data-caption={g.caption}
                   data-chapter-label={`${ui.bookPage.chapter} ${g.chapter}`}
-                  aria-label={g.caption}
                 >
-                  <Image src={g.src} alt={g.caption} width={640} class="gallery-img" />
+                  <Image src={g.src} alt="" width={640} class="gallery-img" />
                   <span class="gallery-caption" lang="ar" dir="rtl">
                     <span class="block text-xs opacity-70" lang={locale} dir="auto">
                       {ui.bookPage.chapter} {g.chapter}

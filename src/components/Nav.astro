@@ -50,7 +50,7 @@ const links = [
 
       <div class="flex items-center gap-1.5">
         <details class="lang relative" data-lang>
-          <summary class="icon-btn gap-1.5 !w-auto px-3" aria-label={ui.nav.language}>
+          <summary class="icon-btn gap-1.5 !w-auto px-3" aria-label={`${ui.nav.language}: ${localeNames[locale].short}`}>
             <Icon name="globe" size={18} />
             <span class="text-xs font-semibold">{localeNames[locale].short}</span>
           </summary>
@@ -133,6 +133,7 @@ const links = [
   }
 
   :global(:root[data-scrolled]) .nav-shell {
+    padding-block: 0.3rem;
     background: var(--surface);
     border-color: var(--border);
     backdrop-filter: blur(16px) saturate(150%);
@@ -210,9 +211,6 @@ const links = [
     font-family: var(--font-sans);
   }
 
-  .lang-item[lang='ar'] {
-    font-family: var(--font-arabic);
-  }
 
   .lang-item:hover {
     background: var(--surface-strong);

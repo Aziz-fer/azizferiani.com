@@ -36,7 +36,8 @@
     const isDawn = () => root.dataset.theme === 'dawn';
 
     function seed() {
-      const count = Math.round(Math.min(280, (width * height) / 5200));
+      const density = width < 700 ? 9000 : 5200;
+      const count = Math.round(Math.min(280, (width * height) / density));
       stars = Array.from({ length: count }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
@@ -169,8 +170,13 @@
       }
     }
 
+    // 30 fps is plenty for slow twinkling and halves the work on phones.
+    let last = 0;
     function loop(now: number) {
-      draw(now);
+      if (now - last >= 33) {
+        last = now;
+        draw(now);
+      }
       frame = requestAnimationFrame(loop);
     }
 
@@ -180,8 +186,13 @@
       else frame = requestAnimationFrame(loop);
     }
 
+    // Draw one static frame right away, but only start animating once the page has loaded,
+    // so the stars never compete with the first paint.
     resize();
-    start();
+    draw(0);
+    const begin = () => ('requestIdleCallback' in window ? requestIdleCallback(start, { timeout: 1500 }) : setTimeout(start, 300));
+    if (document.readyState === 'complete') begin();
+    else window.addEventListener('load', begin, { once: true });
 
     let resizeTimer = 0;
     window.addEventListener('resize', () => {

@@ -21,7 +21,7 @@ const accent: Record<Category, string> = {
 };
 ---
 
-<section id="projects" class="relative py-24 sm:py-32">
+<section id="projects" class="defer-render relative py-24 sm:py-32">
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
     <SectionHeading kicker={ui.projects.kicker} title={ui.projects.title} intro={ui.projects.intro} />
 
@@ -36,7 +36,7 @@ const accent: Record<Category, string> = {
       }
     </div>
 
-    <ul id="project-grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <ul id="project-grid" class="grid gap-5 [perspective:1400px] sm:grid-cols-2 lg:grid-cols-3">
       {
         projects.map((p, i) => (
           <li
@@ -44,6 +44,8 @@ const accent: Record<Category, string> = {
             data-cat={p.category}
             data-reveal
             data-spotlight
+            data-tilt="4"
+            data-tilt-rotate
             style={`--d: ${(i % 3) * 90}ms; --accent: ${accent[p.category]}; view-transition-name: project-${p.id};`}
           >
             <div class="flex items-center justify-between gap-3">
@@ -130,7 +132,16 @@ const accent: Record<Category, string> = {
     transition:
       border-color 0.4s ease,
       box-shadow 0.4s ease,
-      translate 0.4s var(--ease-out-expo);
+      translate 0.4s var(--ease-out-expo),
+      rotate 0.5s var(--ease-out-expo);
+  }
+
+  .project:global(.is-tilting) {
+    transition:
+      border-color 0.4s ease,
+      box-shadow 0.4s ease,
+      translate 0.4s var(--ease-out-expo),
+      rotate 0.1s linear;
   }
 
   .project::before {

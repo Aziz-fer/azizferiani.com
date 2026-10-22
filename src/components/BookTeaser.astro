@@ -16,7 +16,7 @@ const [book] = (await getCollection('books')).sort((a, b) => a.data.order - b.da
 
 {
   book && (
-    <section id="book" class="teaser relative overflow-hidden py-24 sm:py-32">
+    <section id="book" class="defer-render teaser relative overflow-hidden py-24 sm:py-32">
       <div class="teaser-glow" aria-hidden="true" />
       <div class="mx-auto grid max-w-6xl items-center gap-16 px-4 sm:px-6 lg:grid-cols-[1fr_1.15fr]">
         <div class="flex justify-center" data-reveal="scale">

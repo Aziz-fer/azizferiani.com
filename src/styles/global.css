@@ -76,8 +76,10 @@
 @theme {
   --font-sans: 'Inter Variable', 'Amiri', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Cormorant Garamond Variable', 'Aref Ruqaa', Georgia, serif;
-  --font-arabic: 'Amiri', 'Inter Variable', serif;
-  --font-ruqaa: 'Aref Ruqaa', 'Amiri', serif;
+  /* Inter comes first: it has no Arabic letters, so Arabic still uses Amiri/Ruqaa, but spaces,
+     digits and Latin words use the already-loaded Inter instead of extra Latin font files. */
+  --font-arabic: 'Inter Variable', 'Amiri', serif;
+  --font-ruqaa: 'Inter Variable', 'Aref Ruqaa', 'Amiri', serif;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -115,6 +117,12 @@ body {
 :root[lang='ar'] .font-display {
   font-family: var(--font-ruqaa);
   letter-spacing: 0;
+}
+
+/* "العربية" in language switchers uses the system Arabic font, so English and German pages
+   don't download the Amiri web font for one word. */
+a[hreflang='ar'] {
+  font-family: system-ui, 'Segoe UI', Tahoma, sans-serif;
 }
 
 ::selection {
@@ -321,6 +329,37 @@ html {
   opacity: 0.7;
   margin-bottom: 1.5rem;
 }
+}
+
+/* ---------- Above-the-fold entrance (pure CSS, so it never waits for JavaScript).
+   It starts at 1% opacity because browsers ignore fully transparent text when timing the first paint. ---------- */
+[data-enter] {
+  animation: enter-rise 1s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0ms);
+}
+
+[data-enter='scale'] {
+  animation-name: enter-scale;
+}
+
+@keyframes enter-rise {
+  from {
+    opacity: 0.01;
+    transform: translateY(28px);
+  }
+}
+
+@keyframes enter-scale {
+  from {
+    opacity: 0.01;
+    transform: scale(0.94);
+  }
+}
+
+/* Sections below the first screen are only laid out and painted when they come near the viewport. */
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }
 
 /* ---------- Scroll reveal ---------- */

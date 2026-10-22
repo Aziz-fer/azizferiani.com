@@ -8,7 +8,7 @@ export type L10n = Record<Locale, string>;
 export const localeNames: Record<Locale, { short: string; native: string }> = {
   en: { short: 'EN', native: 'English' },
   de: { short: 'DE', native: 'Deutsch' },
-  ar: { short: 'ع', native: 'العربية' },
+  ar: { short: 'AR', native: 'العربية' },
 };
 
 /** BCP 47 tags used for dates and Open Graph. Arabic keeps Latin digits. */
